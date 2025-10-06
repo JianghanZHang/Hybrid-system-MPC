@@ -37,7 +37,7 @@ class GurobiCartpoleWallSolver:
         self.nu_continuous = 3  # u1, u2, u3
         self.nu_binary = 4  # z1, z2, z3, z4
         
-        # Solution storage
+        # Solutions
         self.xs = [np.zeros(self.nx) for _ in range(self.T + 1)]
         self.us = [np.zeros(self.nu_continuous) for _ in range(self.T)]
         self.zs = [np.zeros(self.nu_binary) for _ in range(self.T)]
@@ -72,7 +72,6 @@ class GurobiCartpoleWallSolver:
             except Exception as e:
                 print(f"Warning: Could not set warm start: {e}")
         
-        # Set time limit
         self.gurobi_model.setParam('TimeLimit', maxiter)
         
         # Solve
@@ -122,10 +121,8 @@ class GurobiCartpoleWallSolver:
         m.setParam('OutputFlag', 1)
         m.setParam('MIPGap', 1e-4)
         
-        # States: x[t] for t = 0..T (shape: T+1 x nx)
         x = m.addMVar((self.T + 1, self.nx), lb=self.x_lb, ub=self.x_ub, name="x")
         
-        # Continuous controls: u1, u2, u3 for t = 0..T-1
         u1 = m.addMVar(self.T, lb=self.u1_lb, ub=self.u1_ub, name="u1")
         u2 = m.addMVar(self.T, lb=0, name="u2")
         u3 = m.addMVar(self.T, lb=0, name="u3")
@@ -270,7 +267,6 @@ class GurobiCartpoleWallSolver:
         }
     
     def _set_warm_start(self, xs_init, us_init):
-        """Set warm start values."""
         x = self.vars['x']
         u1 = self.vars['u1']
         u2 = self.vars['u2']
@@ -286,7 +282,6 @@ class GurobiCartpoleWallSolver:
                 u3[t].start = us_init[t][2]
         
     def _extract_solution(self):
-        """Extract solution from Gurobi model."""
         x = self.vars['x']
         u1 = self.vars['u1']
         u2 = self.vars['u2']
@@ -316,7 +311,6 @@ class GurobiCartpoleWallSolver:
         self.mip_gap = self.gurobi_model.MIPGap
     
     def get_solution(self):
-        """Return solution as dict."""
         return {
             'x': np.array(self.xs),
             'u': np.array(self.us),
@@ -329,9 +323,8 @@ class GurobiCartpoleWallSolver:
         }
     
     def print_solution_summary(self):
-        """Print summary of the solution."""
         print("\n" + "="*60)
-        print("GUROBI SOLVER SUMMARY")
+        print("SOLVER SUMMARY")
         print("="*60)
         print(f"Total Cost:      {self.cost:.6f}")
         print(f"Solve Time:      {self.solve_time:.3f} seconds")
