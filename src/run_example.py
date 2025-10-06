@@ -45,10 +45,9 @@ if success:
     l_pole = runningModels[0].l_pole
     d_wall = runningModels[0].d_wall
     
-    # Compute pole tip x position: x_tip = x_cart - l*theta (from paper)
     x_cart = sol['x'][:, 0]
     theta = sol['x'][:, 1]
-    x_tip = x_cart - l_pole * theta  # CORRECTED FORMULA
+    x_tip = x_cart - l_pole * theta 
     
     # Visualize
     fig, axes = plt.subplots(3, 2, figsize=(14, 10))
@@ -79,7 +78,7 @@ if success:
     ax.legend()
     ax.grid(True, alpha=0.3)
     
-    # Pole tip x position (CORRECTED)
+    # Pole tip x position 
     ax = axes[1, 1]
     ax.plot(time, x_tip, 'purple', linewidth=2, label='Pole tip x (cart - l·θ)')
     ax.axhline(d_wall, color='r', linestyle='-', linewidth=2, alpha=0.7, label='Right wall')
@@ -106,9 +105,15 @@ if success:
     # Binary indicators
     ax = axes[2, 1]
     ax.step(time[:-1], sol['z'][:, 0], 'g-', linewidth=2, 
-            label='z1: Left contact', where='post')
+            label='z1: Left displacement', where='post')
+    ax.step(time[:-1], sol['z'][:, 1], 'b-', linewidth=2, 
+            label='z2: Left force', where='post')
+
     ax.step(time[:-1], sol['z'][:, 2], 'm-', linewidth=2, 
-            label='z3: Right contact', where='post')
+            label='z3: Right displacement', where='post')
+    ax.step(time[:-1], sol['z'][:, 3], 'r-', linewidth=2, 
+            label='z4: Right force', where='post')
+
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Contact Indicators')
     ax.set_ylim([-0.1, 1.1])
@@ -117,9 +122,9 @@ if success:
     ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('cartpole_wall_solution.png', dpi=150, bbox_inches='tight')
-    print("\n✅ Plot saved to: cartpole_wall_solution.png")
+    plt.savefig('results/cartpole_wall_solution.png', dpi=150, bbox_inches='tight')
+    print("\nPlot saved to: results/cartpole_wall_solution.png")
     plt.show()
     
 else:
-    print("\n❌ Optimization FAILED!")
+    print("\nOptimization FAILED!")
