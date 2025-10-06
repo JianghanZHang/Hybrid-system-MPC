@@ -1,0 +1,70 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+*.log
+*.out
+*.tmp
+
+# ---- Virtual Environments ----
+.env
+.venv
+env/
+venv/
+*/__pycache__/
+
+# ---- Conda ----
+*.conda
+*.yaml
+*.yml
+*.lock
+
+# ---- Jupyter / Notebooks ----
+.ipynb_checkpoints/
+*.ipynb_save
+*.ipynb_checkpoints/
+
+# ---- VSCode ----
+.vscode/
+.settings/
+*.code-workspace
+
+# ---- Build / CMake / Binaries ----
+build/
+cmake-build*/
+dist/
+*.o
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+
+# ---- Data / Results ----
+logs/
+results/
+output/
+*.csv
+*.npy
+*.npz
+*.mat
+*.pkl
+*.mp4
+*.png
+*.jpg
+
+# ---- Gurobi ----
+gurobi.log
+gurobi_*.log
+*.lp
+*.mps
+*.sol
+*.prm
+
+# ---- OS Specific ----
+.DS_Store
+Thumbs.db
