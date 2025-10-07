@@ -7,21 +7,21 @@ from Gurobi_MIQP_solver import GurobiCartpoleWallSolver
 
 # Time parameters
 dt = 5e-2
-T = 10
+T = 20
 
 # Initial state
-x0 = np.array([0.1, 0.0, 1.0, 0.0])
+x0 = np.array([0.0, 0.0, 1.0, 0.0])
 
 # Create running models
 runningModels = []
 for t in range(T):
     action_model = ActionModelCartpoleWall()
-    action_model.Q = np.eye(4) * 10.
+    action_model.Q = np.eye(4)
     runningModels.append(action_model)
 
 # Terminal model
 terminalModel = ActionModelCartpoleWall()
-terminalModel.Q = terminalModel.Q * 10.0
+# terminalModel.Q = terminalModel.Q * 10.
 
 # Create shooting problem
 problem = crocoddyl.ShootingProblem(x0, runningModels, terminalModel)
@@ -50,14 +50,22 @@ if success:
     x_tip = x_cart - l_pole * theta 
     
     # Visualize
-    fig, axes = plt.subplots(3, 2, figsize=(14, 10))
+    fig, axes = plt.subplots(4, 2, figsize=(14, 10))
     
-    # States (first 3 on left)
-    state_labels = ['Cart Position [m]', 'Pole Angle [rad]', 'Cart Velocity [m/s]']
-    state_limits = [0.5, np.pi/10, 3.0]
+    # ALL 4 STATE ELEMENTS
+    state_labels = ['Cart Position [m]', 
+                    'Pole Angle [rad]', 
+                    'Cart Velocity [m/s]',
+                    'Pole Angular Velocity [rad/s]']
+    state_limits = [0.5, np.pi/10, 1.0, 3.0]
     
-    for i in range(3):
-        ax = axes[i, 0]
+    # Plot all 4 states: position [0,0], angle [1,0], cart vel [0,1], pole ang vel [1,1]
+    state_positions = [(0, 0), (1, 0), (0, 1), (1, 1)]
+    
+    for i in range(4):
+        row, col = state_positions[i]
+        ax = axes[row, col]
+        
         ax.plot(time, sol['x'][:, i], 'b-', linewidth=2, label='Trajectory')
         ax.axhline(0, color='k', linestyle='--', alpha=0.3)
         ax.axhline(state_limits[i], color='r', linestyle=':', alpha=0.5, label='Bounds')
@@ -67,19 +75,8 @@ if success:
         ax.legend()
         ax.grid(True, alpha=0.3)
     
-    # Pole velocity
-    ax = axes[0, 1]
-    ax.plot(time, sol['x'][:, 3], 'b-', linewidth=2, label='Trajectory')
-    ax.axhline(0, color='k', linestyle='--', alpha=0.3)
-    ax.axhline(3.0, color='r', linestyle=':', alpha=0.5, label='Bounds')
-    ax.axhline(-3.0, color='r', linestyle=':', alpha=0.5)
-    ax.set_xlabel('Time [s]')
-    ax.set_ylabel('Pole Velocity [rad/s]')
-    ax.legend()
-    ax.grid(True, alpha=0.3)
-    
     # Pole tip x position 
-    ax = axes[1, 1]
+    ax = axes[2, 0]
     ax.plot(time, x_tip, 'purple', linewidth=2, label='Pole tip x (cart - l·θ)')
     ax.axhline(d_wall, color='r', linestyle='-', linewidth=2, alpha=0.7, label='Right wall')
     ax.axhline(-d_wall, color='r', linestyle='-', linewidth=2, alpha=0.7, label='Left wall')
@@ -90,8 +87,20 @@ if success:
     ax.legend()
     ax.grid(True, alpha=0.3)
     
-    # Controls
-    ax = axes[2, 0]
+#     # Controls and Binary indicators combined
+#     ax = axes[2, 1]
+    
+#     # Plot controls on primary y-axis
+#     ax.plot(time[:-1], sol['u'][:, 0], 'r-', linewidth=2, label='u1 (cart force)', alpha=0.7)
+#     ax.plot(time[:-1], sol['u'][:, 1], 'g-', linewidth=2, label='u2 (left wall)', alpha=0.7)
+#     ax.plot(time[:-1], sol['u'][:, 2], 'm-', linewidth=2, label='u3 (right wall)', alpha=0.7)
+#     ax.axhline(-1.0, color='r', linestyle=':', alpha=0.3)
+#     ax.axhline(1.0, color='r', linestyle=':', alpha=0.3)
+#     ax.set_xlabel('Time [s]')
+#     ax.set_ylabel('Control Forces [N]')
+#     ax.grid(True, alpha=0.3)
+    
+    ax = axes[2, 1]
     ax.plot(time[:-1], sol['u'][:, 0], 'r-', linewidth=2, label='u1 (cart force)')
     ax.plot(time[:-1], sol['u'][:, 1], 'g-', linewidth=2, label='u2 (left wall)')
     ax.plot(time[:-1], sol['u'][:, 2], 'm-', linewidth=2, label='u3 (right wall)')
@@ -103,7 +112,7 @@ if success:
     ax.grid(True, alpha=0.3)
     
     # Binary indicators
-    ax = axes[2, 1]
+    ax = axes[3, 1]
     ax.step(time[:-1], sol['z'][:, 0], 'g-', linewidth=2, 
             label='z1: Left displacement', where='post')
     ax.step(time[:-1], sol['z'][:, 1], 'b-', linewidth=2, 

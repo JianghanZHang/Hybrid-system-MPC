@@ -10,14 +10,14 @@ class ActionModelCartpoleWall(crocoddyl.ActionModelAbstract):
         self.dt = 5e-2
         self.m_cart = 1.0
         self.m_pole = 1.0
-        self.l_pole = 0.5
+        self.l_pole = 1.0
         self.grav = 10.0
         self.stiffness = 100.0   # κ (unused yet)
         self.damping = 10.0       # ν (unused yet)
         self.d_wall = 0.5
 
         # State / control bounds (not enforced yet)
-        self.x_ub = np.array([self.d_wall, np.pi/10, 2.0, 2.0])
+        self.x_ub = np.array([self.d_wall, np.pi/10, 1.0, 1.0])
         self.x_lb = -self.x_ub.copy()
         self.u_ub = np.array([ 1.0,  np.inf,  np.inf])  # u1, u2, u3
         self.u_lb = np.array([-1.0, -np.inf, -np.inf])
